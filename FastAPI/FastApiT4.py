@@ -1,8 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
-from databases import Database
-import random
-
+import asyncpg
 
 # Initialize the FastAPI app
 app = FastAPI()
@@ -10,29 +8,30 @@ app = FastAPI()
 # Database URL (adjust the username, password, hostname, and database name as per your configuration)
 DATABASE_URL = "postgresql://odoo:odoo@localhost:5432/odooDb15"
 
-# Initialize the Database object
-database = Database(DATABASE_URL, min_size=20, max_size=20)  # Example sizes
 
 @app.on_event("startup")
 async def startup():
-    # Connect to the database
-    await database.connect()
+    # Connect to the database and store the connection in app state
+    app.state.db = await asyncpg.create_pool(DATABASE_URL, min_size=20, max_size=20)
+
 
 @app.on_event("shutdown")
 async def shutdown():
-    # Disconnect from the database
-    await database.disconnect()
+    # Close the database connection pool
+    await app.state.db.close()
+
 
 @app.get("/users")
 async def read_users():
-    # SQL query to fetch all users but limit to 10,000
+    # SQL query to fetch all users but limit to 1000
     query = "SELECT * FROM load_test LIMIT 1000"
 
-    # Execute the query
-    results = await database.fetch_all(query)
+    async with app.state.db.acquire() as connection:
+        # Execute the query
+        results = await connection.fetch(query)
 
     # Return the results as JSON
-    return results
+    return [dict(record) for record in results]
 
 
 if __name__ == "__main__":
