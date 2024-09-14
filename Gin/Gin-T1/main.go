@@ -1,34 +1,102 @@
 package main
 
 import (
-    "github.com/gin-gonic/gin"
-    "strconv"
+	"context"
+	"log"
+	"net/http"
+	"sync"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
+	jsoniter "github.com/json-iterator/go"
 )
 
-type User struct {
-    ID          int    `json:"id"`
-    Name        string `json:"name"`
-    Description string `json:"description"`
+var (
+	redisClient *redis.Client
+	once        sync.Once
+	ctx         = context.Background()
+	json        = jsoniter.ConfigFastest
+)
+
+// Initialize Redis connection pool once during startup
+func initRedis() {
+	once.Do(func() {
+		redisClient = redis.NewClient(&redis.Options{
+			Addr:     "3.110.145.75:6379",
+			Password: "", // No password set
+			DB:       0,  // use default DB
+			PoolSize: 20, // Max connections
+		})
+	})
+}
+
+// Handle Redis connection shutdown
+func closeRedis() {
+	if err := redisClient.Close(); err != nil {
+		log.Println("Error closing Redis connection:", err)
+	}
+}
+
+// Handler for the /test1 endpoint
+func getValueFromRedis(c *gin.Context) {
+	initRedis() // Ensure Redis is initialized
+
+	value, err := redisClient.Get(ctx, "TestJSON").Result()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"data": nil})
+		return
+	}
+
+	var valueDict map[string]interface{}
+	if err := json.UnmarshalFromString(value, &valueDict); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse JSON"})
+		return
+	}
+
+	// Optimized loop to replace 'default_value' keys
+	if data, ok := valueDict["data"].(map[string]interface{}); ok {
+		if stepData, ok := data["step_data"].(map[string]interface{}); ok {
+			if pages, ok := stepData["pages"].([]interface{}); ok {
+				for _, page := range pages {
+					if pageMap, ok := page.(map[string]interface{}); ok {
+						if sectionsList, ok := pageMap["sections_list"].([]interface{}); ok {
+							for _, section := range sectionsList {
+								if sectionMap, ok := section.(map[string]interface{}); ok {
+									if fieldsList, ok := sectionMap["fields_list"].([]interface{}); ok {
+										for _, field := range fieldsList {
+											if fieldMap, ok := field.(map[string]interface{}); ok {
+												if key, ok := fieldMap["key"]; ok {
+													fieldMap["default_value"] = key
+												} else {
+													fieldMap["default_value"] = nil
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": valueDict})
 }
 
 func main() {
-    gin.SetMode(gin.ReleaseMode)   // Set Gin to release mode to suppress debug and color output
-    gin.DisableConsoleColor()      // Optional: disable color output
+	// Set up Gin router
+	r := gin.Default()
 
-    r := gin.Default() // Create a router with default middleware: logger and recovery (crash-free) middleware
+	// Route for /test1
+	r.GET("/test1", getValueFromRedis)
 
-    r.GET("/users", func(c *gin.Context) {
-        var users []User
-        for i := 0; i < 100; i++ {
-            user := User{
-                ID:          i,
-                Name:        "User " + strconv.Itoa(i),
-                Description: "Description " + strconv.Itoa(i),
-            }
-            users = append(users, user)
-        }
-        c.JSON(200, users) // Respond with JSON containing the list of users
-    })
+	// Start server on port 9000
+	if err := r.Run(":9000"); err != nil {
+		log.Fatal("Failed to start server:", err)
+	}
 
-    r.Run() // Run the server on default port 8080
+	// Close Redis connection when shutting down
+	defer closeRedis()
 }

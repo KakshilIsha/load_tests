@@ -7,7 +7,8 @@ from typing import Optional
 redis_client: Optional[Redis] = None
 redis_pool: Optional[ConnectionPool] = None
 
-app = FastAPI()
+app = FastAPI(docs_url=None, redoc_url=None, debug=False)
+
 
 @app.on_event("startup")
 async def on_startup() -> None:
