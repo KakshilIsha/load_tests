@@ -46,4 +46,5 @@ app = Litestar(
     route_handlers=[get_value_from_redis],
     on_startup=[on_startup],
     on_shutdown=[on_shutdown],
+    debug=False  # Explicitly disable debug mode
 )
