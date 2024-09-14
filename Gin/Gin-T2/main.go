@@ -52,10 +52,10 @@ func main() {
 	router.Use(gin.Recovery())
 
 	// Define the route and the handler
-	router.GET("/test2/", queryData)
+	router.GET("/test2", queryData)
 
 	// Start the Gin server using the default `net/http` server
-	if err := router.Run(":8080"); err != nil {
+	if err := router.Run(":9000"); err != nil {
 		fmt.Fprintf(os.Stderr, "Server failed to start: %v\n", err)
 	}
 }
