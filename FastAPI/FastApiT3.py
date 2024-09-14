@@ -23,6 +23,8 @@ async def shutdown():
 
 @app.get("/users")
 async def read_users():
+
+
     # SQL query to fetch all users but limit to 100
     query = "SELECT * FROM load_test LIMIT 100"
 
