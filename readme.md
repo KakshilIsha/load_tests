@@ -1,6 +1,6 @@
 ## To run FastAPI, use command:
 ```
-uvicorn FastApiT1:app --host 127.0.0.1 --port 8000 --workers 8 --log-level critical
+uvicorn FastApiT1:app --host 127.0.0.1 --port 9000 --workers 8 --log-level critical
 ``` 
 
 ## To run Litestar, use command:
