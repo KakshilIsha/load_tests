@@ -39,7 +39,6 @@ func closeRedis() {
 
 // Handler for the /test1 endpoint
 func getValueFromRedis(c *gin.Context) {
-	initRedis() // Ensure Redis is initialized
 
 	value, err := redisClient.Get(ctx, "TestJSON").Result()
 	if err != nil {
@@ -88,6 +87,7 @@ func getValueFromRedis(c *gin.Context) {
 func main() {
 	// Set up Gin router
 	r := gin.Default()
+	initRedis() // Ensure Redis is initialized
 
 	// Route for /test1
 	r.GET("/test1", getValueFromRedis)
