@@ -22,7 +22,7 @@ var (
 func initRedis() {
 	once.Do(func() {
 		redisClient = redis.NewClient(&redis.Options{
-			Addr:     "3.110.145.75:6379",
+			Addr:     "52.66.234.102:6379",
 			Password: "", // No password set
 			DB:       0,  // use default DB
 			PoolSize: 20, // Max connections
