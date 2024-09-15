@@ -17,7 +17,7 @@ app = FastAPI()
 # Create a global database connection pool
 @app.on_event("startup")
 async def on_startup():
-    app.state.db = await asyncpg.create_pool(DATABASE_URL, min_size=20, max_size=50)
+    app.state.db = await asyncpg.create_pool(DATABASE_URL, min_size=50, max_size=100)
 
 @app.on_event("shutdown")
 async def on_shutdown():

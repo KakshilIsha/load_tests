@@ -14,7 +14,7 @@ DATABASE_URL = "postgresql://postgres:ishapostgres@52.66.234.102:5432/postgres"
 
 # Application startup event to create connection pool
 async def on_startup(app: Litestar) -> None:
-    app.state.db = await asyncpg.create_pool(DATABASE_URL, min_size=20, max_size=50)
+    app.state.db = await asyncpg.create_pool(DATABASE_URL, min_size=50, max_size=100)
 
 
 # Application shutdown event to close the connection pool

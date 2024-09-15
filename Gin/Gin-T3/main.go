@@ -26,9 +26,9 @@ func main() {
 
 	// Initialize database connection pool
 	var err error
-	db, err = pgxpool.Connect(context.Background(), databaseURL)
+	db, err = InitDatabase()
 	if err != nil {
-		log.Fatalf("Unable to connect to database: %v\n", err)
+		log.Fatalf("Unable to initialize database: %v\n", err)
 		os.Exit(1)
 	}
 	defer db.Close()
@@ -37,7 +37,26 @@ func main() {
 	r.POST("/test3/", submitData)
 
 	// Start server
-	r.Run(":9000") // Start the server on port 8080
+	r.Run(":9000") // Start the server on port 9000
+}
+
+// Initialize the database pool with custom connection pool size
+func InitDatabase() (*pgxpool.Pool, error) {
+	dbUrl := databaseURL
+	config, err := pgxpool.ParseConfig(dbUrl)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse config: %w", err)
+	}
+
+	// Set connection pool size
+	config.MaxConns = 100
+	config.MinConns = 50
+
+	dbPool, err := pgxpool.ConnectConfig(context.Background(), config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create pool: %w", err)
+	}
+	return dbPool, nil
 }
 
 // Calculate the average of col9 from the read_table

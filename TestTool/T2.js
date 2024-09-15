@@ -12,3 +12,5 @@ export let options = {
     vus: 100,
     duration: "30s"
 };
+
+
