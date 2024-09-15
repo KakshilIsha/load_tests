@@ -25,7 +25,7 @@ func initRedis() {
 			Addr:     "3.110.66.116:6379",
 			Password: "", // No password set
 			DB:       0,  // use default DB
-			PoolSize: 20, // Max connections
+			PoolSize: 100, // Max connections
 		})
 	})
 }
