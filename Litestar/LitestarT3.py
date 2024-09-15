@@ -9,7 +9,7 @@ STATIC_USERNAME = "isha"
 STATIC_PASSWORD = "password"
 
 # PostgreSQL database URL
-DATABASE_URL = "postgresql://postgres:ishapostgres@52.66.234.102:5432/postgres"
+DATABASE_URL = "postgresql://postgres:ishapostgres@3.110.66.116:5432/postgres"
 
 
 # Application startup event to create connection pool

@@ -11,7 +11,7 @@ redis_pool: Optional[ConnectionPool] = None
 async def on_startup() -> None:
     """Initialize the Redis connection pool once when the app starts."""
     global redis_client, redis_pool
-    redis_pool = ConnectionPool(host='52.66.234.102', port=6379, db=0, max_connections=20)
+    redis_pool = ConnectionPool(host='3.110.66.116', port=6379, db=0, max_connections=20)
     redis_client = Redis(connection_pool=redis_pool)
 
 

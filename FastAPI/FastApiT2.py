@@ -9,7 +9,7 @@ import decimal
 app = FastAPI(docs_url=None, redoc_url=None, debug=False)
 
 # PostgreSQL database URL
-DATABASE_URL = "postgresql://postgres:ishapostgres@52.66.234.102:5432/postgres"
+DATABASE_URL = "postgresql://postgres:ishapostgres@3.110.66.116:5432/postgres"
 
 
 @app.on_event("startup")
