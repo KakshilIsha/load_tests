@@ -9,7 +9,7 @@ STATIC_USERNAME = "isha"
 STATIC_PASSWORD = "password"
 
 # PostgreSQL database URL
-DATABASE_URL = "postgresql://postgres:ishapostgres@3.110.66.116:5432/postgres"
+DATABASE_URL = "postgresql://postgres:ishapostgres@52.66.222.58:5432/postgres"
 
 # Create FastAPI app
 app = FastAPI()

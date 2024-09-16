@@ -7,7 +7,7 @@ import decimal
 from typing import Dict, Any
 
 # PostgreSQL database URL
-DATABASE_URL = "postgresql://postgres:ishapostgres@3.110.66.116:5432/postgres"
+DATABASE_URL = "postgresql://postgres:ishapostgres@52.66.222.58:5432/postgres"
 
 # Helper function to handle Decimal serialization
 def decimal_to_float(obj):
