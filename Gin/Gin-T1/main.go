@@ -51,6 +51,10 @@ func getValueFromRedis(c *gin.Context) {
 		return
 	}
 
+    //ToDo: define a struct. Unmarshal to struct and then marshal back to JSON
+    //ToDo: Overwrite default marshal with sonic
+
+
 	// Optimized loop to replace 'default_value' keys
 	if data, ok := valueDict["data"].(map[string]interface{}); ok {
 		if stepData, ok := data["step_data"].(map[string]interface{}); ok {
