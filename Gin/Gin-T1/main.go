@@ -6,16 +6,15 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/bytedance/sonic"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
-	jsoniter "github.com/json-iterator/go"
 )
 
 var (
 	redisClient *redis.Client
 	once        sync.Once
 	ctx         = context.Background()
-	json        = jsoniter.ConfigFastest
 )
 
 // Initialize Redis connection pool once during startup
@@ -47,7 +46,7 @@ func getValueFromRedis(c *gin.Context) {
 	}
 
 	var valueDict map[string]interface{}
-	if err := json.UnmarshalFromString(value, &valueDict); err != nil {
+	if err := sonic.UnmarshalString(value, &valueDict); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse JSON"})
 		return
 	}
