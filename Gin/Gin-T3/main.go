@@ -17,7 +17,7 @@ var db *pgxpool.Pool
 const (
 	staticUsername = "isha"
 	staticPassword = "password"
-	databaseURL    = "postgresql://postgres:ishapostgres@3.110.66.116:5432/postgres"
+	databaseURL    = "postgresql://postgres:ishapostgres@3.110.140.138:5432/postgres"
 )
 
 func main() {

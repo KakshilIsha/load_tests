@@ -20,7 +20,7 @@ var pool *pgxpool.Pool
 
 // InitDatabase initializes the connection pool for PostgreSQL
 func InitDatabase() (*pgxpool.Pool, error) {
-	dbUrl := "postgresql://postgres:ishapostgres@3.110.66.116:5432/postgres"
+	dbUrl := "postgresql://postgres:ishapostgres@3.110.140.138:5432/postgres"
 	config, err := pgxpool.ParseConfig(dbUrl)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse config: %w", err)
