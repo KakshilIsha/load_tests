@@ -17,13 +17,97 @@ var (
 	ctx         = context.Background()
 )
 
+type Page struct {
+	PageType           string    `json:"page_type"`
+	Title              string    `json:"title"`
+	ShouldDisplayTitle bool      `json:"should_display_title"`
+	PageNumber         int       `json:"page_number"`
+	SubTitle           string    `json:"sub_title"`
+	PreSectionMessage  string    `json:"pre_section_message"`
+	PostSectionMessage string    `json:"post_section_message"`
+	SectionsList       []Section `json:"sections_list"`
+}
+
+type Section struct {
+	Title               string        `json:"title"`
+	ShouldDisplayTitle  bool          `json:"should_display_title"`
+	SectionDisplayOrder int           `json:"section_display_order"`
+	SubTitle            bool          `json:"sub_title"`
+	IsReplicable        bool          `json:"is_replicable"`
+	FieldsList          []Field       `json:"fields_list"`
+	GroupsList          []interface{} `json:"groups_list"`
+	ID                  int           `json:"id"`
+}
+
+type Field struct {
+	Key                string        `json:"key"`
+	Title              string        `json:"title"`
+	PlaceholderText    string        `json:"placeholder_text"`
+	DefaultValue       string        `json:"default_value"`
+	HelperText         string        `json:"helper_text"`
+	ShouldCallAPI      bool          `json:"should_call_api"`
+	IsMarketingTracked bool          `json:"is_marketing_tracked"`
+	DisplayOrder       int           `json:"display_order"`
+	Prefix             string        `json:"prefix"`
+	Suffix             string        `json:"suffix"`
+	Comments           string        `json:"comments"`
+	ShouldDisplay      bool          `json:"should_display"`
+	ShouldDisplayTitle bool          `json:"should_display_title"`
+	Type               string        `json:"type"`
+	Choices            []Choice      `json:"choices"`
+	DisplayConditions  []interface{} `json:"display_conditions"`
+	Validation         any           `json:"validation"`
+	SectionID          int           `json:"section_id"`
+}
+
+type Choice struct {
+	DisplayTitle string `json:"display_title"`
+	DisplayOrder int    `json:"display_order"`
+	Value        string `json:"value"`
+}
+
+type Validation struct {
+	Name         string `json:"name"`
+	Regex        string `json:"regex"`
+	ErrorMessage string `json:"error_message"`
+	Required     bool   `json:"required"`
+	MinLength    int    `json:"min_length"`
+	MaxLength    int    `json:"max_length"`
+}
+
+type StepData struct {
+	FormID             int        `json:"form_id"`
+	AvailableLanguages []Language `json:"available_languages"`
+	Title              string     `json:"title"`
+	Description        string     `json:"description"`
+	ActionURL          string     `json:"action_url"`
+	ActionMethod       string     `json:"action_method"`
+	Pages              []Page     `json:"pages"`
+}
+
+type Language struct {
+	DisplayTitle string `json:"display_title"`
+	Value        string `json:"value"`
+}
+
+type Data struct {
+	StepData StepData `json:"step_data"`
+	StepID   any      `json:"step_id"`
+}
+
+type Response struct {
+	Msg   string `json:"msg"`
+	MsgID string `json:"msgid"`
+	Data  Data   `json:"data"`
+}
+
 // Initialize Redis connection pool once during startup
 func initRedis() {
 	once.Do(func() {
 		redisClient = redis.NewClient(&redis.Options{
 			Addr:     "3.110.66.116:6379",
-			Password: "", // No password set
-			DB:       0,  // use default DB
+			Password: "",  // No password set
+			DB:       0,   // use default DB
 			PoolSize: 100, // Max connections
 		})
 	})
@@ -45,41 +129,18 @@ func getValueFromRedis(c *gin.Context) {
 		return
 	}
 
-	var valueDict map[string]interface{}
+	var valueDict Response
 	if err := sonic.UnmarshalString(value, &valueDict); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse JSON"})
 		return
 	}
 
-    //ToDo: define a struct. Unmarshal to struct and then marshal back to JSON
-    //ToDo: Overwrite default marshal with sonic
 
-
-	// Optimized loop to replace 'default_value' keys
-	if data, ok := valueDict["data"].(map[string]interface{}); ok {
-		if stepData, ok := data["step_data"].(map[string]interface{}); ok {
-			if pages, ok := stepData["pages"].([]interface{}); ok {
-				for _, page := range pages {
-					if pageMap, ok := page.(map[string]interface{}); ok {
-						if sectionsList, ok := pageMap["sections_list"].([]interface{}); ok {
-							for _, section := range sectionsList {
-								if sectionMap, ok := section.(map[string]interface{}); ok {
-									if fieldsList, ok := sectionMap["fields_list"].([]interface{}); ok {
-										for _, field := range fieldsList {
-											if fieldMap, ok := field.(map[string]interface{}); ok {
-												if key, ok := fieldMap["key"]; ok {
-													fieldMap["default_value"] = key
-												} else {
-													fieldMap["default_value"] = nil
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
+	for i, page := range valueDict.Data.StepData.Pages {
+		for j, section := range page.SectionsList {
+			for k, field := range section.FieldsList {
+				// Replace the default_value with the key value
+				valueDict.Data.StepData.Pages[i].SectionsList[j].FieldsList[k].DefaultValue = field.Key
 			}
 		}
 	}
