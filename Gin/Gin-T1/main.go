@@ -63,7 +63,7 @@ type Field struct {
 type Choice struct {
 	DisplayTitle string `json:"display_title"`
 	DisplayOrder int    `json:"display_order"`
-	Value        string `json:"value"`
+	Value        any    `json:"value"`
 }
 
 type Validation struct {
@@ -134,7 +134,6 @@ func getValueFromRedis(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse JSON"})
 		return
 	}
-
 
 	for i, page := range valueDict.Data.StepData.Pages {
 		for j, section := range page.SectionsList {
