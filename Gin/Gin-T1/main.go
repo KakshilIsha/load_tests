@@ -105,7 +105,7 @@ type Response struct {
 func initRedis() {
 	once.Do(func() {
 		redisClient = redis.NewClient(&redis.Options{
-			Addr:     "3.110.66.116:6379",
+			Addr:     "3.110.140.138:6379",
 			Password: "",  // No password set
 			DB:       0,   // use default DB
 			PoolSize: 100, // Max connections
