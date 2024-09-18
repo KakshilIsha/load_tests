@@ -1,4 +1,4 @@
-import orjson
+import json
 from redis.asyncio import Redis, ConnectionPool
 from litestar import Litestar, get
 from typing import Optional
@@ -11,7 +11,7 @@ redis_pool: Optional[ConnectionPool] = None
 async def on_startup() -> None:
     """Initialize the Redis connection pool once when the app starts."""
     global redis_client, redis_pool
-    redis_pool = ConnectionPool(host='3.110.140.138', port=6379, db=0, max_connections=100)
+    redis_pool = ConnectionPool(host='13.235.64.40', port=6379, db=0, max_connections=100)
     redis_client = Redis(connection_pool=redis_pool)
 
 
@@ -27,9 +27,7 @@ async def on_shutdown() -> None:
 async def get_value_from_redis() -> dict:
     value = await redis_client.get('TestJSON')
     if value:
-        # Decode using orjson for faster performance
-        value_dict = orjson.loads(value)
-
+        value_dict = json.loads(value)
         # Perform the loop optimizations and key replacements in one pass
         for page in value_dict['data']['step_data']['pages']:
             for section in page['sections_list']:

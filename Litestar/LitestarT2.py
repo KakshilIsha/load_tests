@@ -1,13 +1,12 @@
 from litestar import Litestar, get
 from litestar.datastructures import State
 import asyncpg
-import orjson
 import random
 import decimal
 from typing import Dict, Any
-
+import json
 # PostgreSQL database URL
-DATABASE_URL = "postgresql://postgres:ishapostgres@3.110.140.138:5432/postgres"
+DATABASE_URL = "postgresql://postgres:ishapostgres@13.235.64.40:5432/postgres"
 
 # Helper function to handle Decimal serialization
 def decimal_to_float(obj):
@@ -44,7 +43,7 @@ async def query_data(state: State, value: int) -> Dict[str, Any]:
     for row in rows:
         row_dict = dict(row)
         row_dict["col2"] = random.randint(1, 1000)  # Modify some values
-        json_data = orjson.loads(row_dict["col15"])
+        json_data = json.loads(row_dict["col15"])
         json_data["key_1"] = "UpdatedValue"
         row_dict["col15"] = json_data
         result.append(row_dict)
