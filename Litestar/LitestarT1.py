@@ -80,7 +80,7 @@ class Response(msgspec.Struct):
 async def on_startup() -> None:
     """Initialize the Redis connection pool once when the app starts."""
     global redis_client, redis_pool
-    redis_pool = ConnectionPool(host='52.66.217.49', port=6379, db=0, max_connections=100)
+    redis_pool = ConnectionPool(host='3.110.70.122', port=6379, db=0, max_connections=100)
     redis_client = Redis(connection_pool=redis_pool)
 
 
